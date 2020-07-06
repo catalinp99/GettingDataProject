@@ -13,7 +13,7 @@ if (!file.exists('UCI HAR Dataset')) {
 setwd("./UCI HAR Dataset")
 
 ### 1. Merges the training and the test sets to create one data set.
-# Load data
+# Load features and activities lookups
 features <-
   read_delim("features.txt", col_names = FALSE, delim = ' ') %>% pull(var = 2)
 activities <-
@@ -40,20 +40,23 @@ activities <-
     read_table(file.path(dir, type, paste('Y_', type, '.txt', sep = '')), col_names = 'activity')
   bind_cols(subjects, ydata, xdata)
 }
-
+# Load test/train data using helper function and merge into one data frame
 testdata <- .load('test')
 traindata <- .load('train')
 alldata <- bind_rows(traindata, testdata)
 
 ### 2. Extracts only the measurements on the mean and standard deviation for each measurement.
+# Keep only the feature columns containing either the 'mean' or 'std' strings 
 alldata <-
   select(alldata, subject, activity, contains(c("mean", "std"), ignore.case = FALSE))
 
 ### 3. Uses descriptive activity names to name the activities in the data set
+# Replace the numerical values with string values for activities
 alldata <-
   mutate(alldata, activity = activities$activity[alldata$activity]) # todo factorial
 
 ### 4. Appropriately labels the data set with descriptive variable names.
+# Clean and tidy column names
 labels <- names(alldata)
 labels <- gsub('^t', "time_", labels)
 labels <- gsub('^f', "freq_", labels)
@@ -62,9 +65,11 @@ labels <- gsub('\\(\\)', "", labels)
 names(alldata) <- labels
 
 ### 5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+# Group by activity and subject, and summarise the mean for all the feature columns
 grouped_data <-
   alldata %>% group_by(activity, subject) %>% summarise(across(time_BodyAcc_mean_X:freq_BodyBodyGyroJerkMag_std, mean))
+# Write the summary dataset into a text file
 setwd("..")
-write.table(grouped_data, file = "clean_data.txt", row.names = FALSE)
+write.table(grouped_data, file = "summary_mean.txt", row.names = FALSE)
 
 print(grouped_data)
