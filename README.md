@@ -34,7 +34,7 @@ You should create one R script called run_analysis.R that does the following.
 
 ## Implementation
 
-The R script that executes the above steps is _run_analysis.R_. To execute it, download the R file locally, open an R terminal in the same directory and execute `source('run_analysis.R')`
+The R script that executes the above steps is _[run_analysis.R](run_analysis.R)_. To execute it, download the R file locally, open an R terminal in the same directory and execute `source('run_analysis.R')`
 
 The script will save the tidy data set (as per requirements) in a text file called *summary_mean.txt*, with values separated by space.
 
